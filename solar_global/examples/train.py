@@ -38,7 +38,7 @@ warnings.filterwarnings("ignore",  category=UserWarning)
 warnings.filterwarnings("ignore",  category=FutureWarning)
 
 training_dataset_names = ['retrieval-SfM-120k', 'gl18']
-test_datasets_names = ['oxford5k', 'paris6k', 'roxford5k', 'rparis6k', 'megadepth']
+test_datasets_names = ['oxford5k', 'paris6k', 'roxford5k', 'rparis6k', 'megadepth', 'gl18']
 test_whiten_names = ['retrieval-SfM-30k', 'retrieval-SfM-120k']
 
 model_names = sorted(name for name in models.__dict__
