@@ -14,9 +14,9 @@ def _id_to_qid(_id_list, _id_dict_):
 
     return qid_list
 
-csv_fn = 'train.csv'
-train_fn = 'boxes_split1.csv'
-val_fn = 'boxes_split2.csv'
+csv_fn = 'train_custom.csv'
+train_fn = 'boxes_split_train.csv'
+val_fn = 'boxes_split_val.csv'
 
 csvfile = open(csv_fn, 'r')
 csvreader = csv.reader(csvfile)
@@ -63,14 +63,18 @@ train_and_val_list['train'] = train_list
 
 print("Finding all val images that succesfully downloaded")
 for cid in tqdm(val_list_all):
-    if os.path.exists(os.path.join('train', cid + '.jpg')):
+    if os.path.exists(os.path.join('val', cid + '.jpg')):
         val_list.append(cid)
         landmark_ids['val'].append(key_landmark_dict[cid])
+
 print(len(val_list))
 train_and_val_list['val'] = val_list
 
 train_list = [cid for cid in train_list_all if os.path.exists(os.path.join('train', cid + '.jpg'))]
-val_list = [cid for cid in val_list_all if os.path.exists(os.path.join('train', cid + '.jpg'))]
+# print('train_list')
+# print(train_list)
+# print(len(train_list))
+val_list = [cid for cid in val_list_all if os.path.exists(os.path.join('val', cid + '.jpg'))]
 
 key_landmark_list = key_landmark_list[1:]  # Chop off header
 
@@ -130,7 +134,12 @@ for mode in ['train', 'val']:
   
     boxes_dict = boxes[mode]
 
+    # print('image_list')
+    # print(tqdm(image_list))
+    # print(len(tqdm(image_list)))
     for i, image in enumerate(tqdm(image_list)):
+        # print(i)
+
         positives = []
 
         db_dict[mode]['cids'].append(image)
@@ -140,19 +149,18 @@ for mode in ['train', 'val']:
 
         pidxs_potential = landmark_to_qids[mode][landmark]
 
+        # try: 
+        #     pidxs_potential.remove(image)
+        # except:
+        #     pass
 
-        try: 
-            pidxs_potential.remove(image)
-        except:
-            pass
+        # try:
+        #     pidxs_potential.remove(i)
+        # except:
+        #     pass
 
-        try:
-            pidxs_potential.remove(i)
-        except:
-            pass
-
-        if len(pidxs_potential) == 0:
-            continue
+        # if len(pidxs_potential) == 0:
+        #     continue
     
         pidxs = np.random.choice(pidxs_potential, min(len(pidxs_potential), 1)).tolist()
 
@@ -164,7 +172,15 @@ for mode in ['train', 'val']:
 
         db_dict[mode]['qidxs'].append(i)
         db_dict[mode]['pidxs'].append(pidxs)
+        # print('qidxs')
+        # print(db_dict[mode]['qidxs'])
+        # print('pidxs')
+        # print(db_dict[mode]['pidxs'])
+        # print('!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        # print(i)
 
+with open(f'/home/human/Diana_Iakovleva/image_retrieval/SOLAR/db_dict_gl18.csv', 'w') as file:
+    file.write(str(db_dict))
 
 save_path = './db_gl18.pkl'
 
