@@ -10,6 +10,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 import numpy as np
 
 import torch
+import glob
 from torch.utils.model_zoo import load_url
 from torch.utils.tensorboard import SummaryWriter
 from torchvision import transforms
@@ -33,7 +34,7 @@ except:
     pass
 
 
-datasets_names = ['oxford5k', 'paris6k', 'roxford5k', 'rparis6k', 'revisitop1m']
+datasets_names = ['oxford5k', 'paris6k', 'roxford5k', 'rparis6k', 'revisitop1m', 'gl18']
 
 # test options
 parser = argparse.ArgumentParser(description='PyTorch CNN Image Retrieval Example')
@@ -168,6 +169,128 @@ def main():
 
         print('')
         print('>> {}: elapsed time: {}'.format(dataset, htime(time.time()-start)))
+
+    # args = parser.parse_args()
+
+    # # check if there are unknown datasets
+    # for dataset in args.datasets.split(','):
+    #     if dataset not in datasets_names:
+    #         raise ValueError('Unsupported or unknown dataset: {}!'.format(dataset))
+
+    # # check if test dataset are downloaded
+    # # and download if they are not
+    # # download_test(get_data_root())
+
+    # # setting up the visible GPU
+    # os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
+
+    # # loading network
+    # net = load_network(network_name=args.network)
+    # net.mode = 'test'
+    # # x = torch.randn(1, 3, 256, 256, requires_grad=False)
+    # # torch.onnx.export(net, x, "solar.onnx", opset_version=12, verbose=True)
+
+    # print(">>>> loaded network: ")
+    # print(net.meta_repr())
+
+    # # setting up the multi-scale parameters
+    # ms = list(eval(args.multiscale))
+
+    # print(">>>> Evaluating scales: {}".format(ms))
+
+    # # moving network to gpu and eval mode
+    # net.cuda()
+    # net.eval()
+
+    # # set up the transform
+    # normalize = transforms.Normalize(
+    #     mean=net.meta['mean'],
+    #     std=net.meta['std']
+    # )
+    # transform = transforms.Compose([
+    #     transforms.ToTensor(),
+    #     normalize
+    # ])
+
+    # # evaluate on test datasets
+    # datasets = args.datasets.split(',')
+    # for dataset in datasets:
+    #     start = time.time()
+
+    #     print('')
+    #     print('>> {}: Extracting...'.format(dataset))
+
+    #     # prepare config structure for the test dataset
+    #     dataset_root_path = os.path.join(get_data_root(),'test',dataset)
+    #     images = []
+    #     qimages = []
+    #     images_path = os.listdir(os.path.join(dataset_root_path,'query'))
+    #     for dir_name in images_path:
+    #         image_paths = glob.glob(os.path.join(dataset_root_path,'query', dir_name, '*.jpg'))
+    #         for image_path in image_paths:
+    #             qimages.append(image_path)
+    #     images_path = os.listdir(os.path.join(dataset_root_path,'gallery'))
+    #     for dir_name in images_path:
+    #         image_paths = glob.glob(os.path.join(dataset_root_path,'gallery', dir_name, '*.jpg'))
+    #         for image_path in image_paths:
+    #             images.append(image_path)
+    #     try:
+    #         # bbxs = [tuple(cfg['gnd'][i]['bbx']) for i in range(cfg['nq'])]
+    #         bbxs = None  # for holidaysmanrot and copydays
+    #     except:
+    #         bbxs = None  # for holidaysmanrot and copydays
+
+    #     # extract database and query vectors
+    #     print('>> {}: database images...'.format(dataset))
+    #     vecs = extract_vectors(net, images, args.image_size, transform, ms=ms, mode='test')
+    #     vecs = vecs.numpy()
+
+    #     print('>> {}: query images...'.format(dataset))
+    #     qvecs = extract_vectors(net, qimages, args.image_size, transform, bbxs=bbxs, ms=ms, mode='test')
+    #     qvecs = qvecs.numpy()
+
+    #     print('>> {}: Evaluating...'.format(dataset))
+
+    #     # search, rank, and print
+    #     scores = np.dot(vecs.T, qvecs)
+    #     ranks = np.argsort(-scores, axis=0)
+    #     scoresT = scores.T
+    #     ranksT = ranks.T
+    #     top1 = 0
+    #     top_one = 0
+    #     mAP = 0.0
+    #     false_alarm_num = 0
+    #     for i in range(ranksT.shape[0]):
+    #         t = 0
+    #         rank = 0.0
+    #         query_id0 = qimages[i][qimages[i].rfind('/')-4:qimages[i].rfind('/')]
+    #         gallery_id0 = images[ranksT[i][0]][images[ranksT[i][0]].rfind('/')-4:images[ranksT[i][0]].rfind('/')]
+    #         # print(query_id0)
+    #         # print(gallery_id0)
+    #         if query_id0 == gallery_id0:
+    #             top1 += 1
+    #         # print(scoresT[i][ranksT[i][0]])
+    #         if query_id0 == gallery_id0 and scoresT[i][ranksT[i][0]] > 0.6:
+    #             top_one += 1
+    #         query_id = qimages[i][qimages[i].rfind('/')-4:qimages[i].rfind('/')]
+    #         for j in range(ranksT.shape[1]):
+    #             gallery_id = images[ranksT[i][j]][images[ranksT[i][j]].rfind('/')-4:images[ranksT[i][j]].rfind('/')]
+    #             if query_id == gallery_id:
+    #                 t += 1
+    #                 rank += t/(j+1)
+    #             if query_id != gallery_id and scoresT[i][ranksT[i][j]] > 0.6:
+    #                 false_alarm_num += 1
+    #         if t == 0:
+    #             continue
+    #         mAP += rank / t
+    #         print('{}.{} AP = {}%'.format(i, query_id, rank / t * 100))
+    #     query_num = len(qimages)
+    #     print('TOP1 num: {}'.format(top1))
+    #     print('TOP1 recall: {}%'.format(top1 / query_num * 100))
+    #     print('mAP = {}%'.format(mAP / query_num * 100))
+    #     print('accuray: {}%'.format(top_one / query_num * 100))
+    #     print('false num: {}'.format(false_alarm_num))
+    #     print('false rate: {}%'.format(false_alarm_num / query_num * 100))
 
 
 if __name__ == '__main__':

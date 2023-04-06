@@ -168,7 +168,7 @@ def init_network(params):
     pooling = params.get('pooling', 'gem')
     p = params.get('p', 3.)
     regional = params.get('regional', False)
-    whitening = params.get('whitening', False)
+    whitening = params.get('whitening', True)
     mean = params.get('mean', [0.485, 0.456, 0.406])
     std = params.get('std', [0.229, 0.224, 0.225])
     pretrained = params.get('pretrained', True)
@@ -177,7 +177,7 @@ def init_network(params):
     pretrained_type = params.get('pretrained_type', 'SfM120k')
     flatten_desc = params.get('flatten_desc', False)
     mode = params.get('mode', 'train')
-
+    print(OUTPUT_DIM[architecture])
     # get output dimensionality size
     dim = OUTPUT_DIM[architecture]
 
